@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistem Proyeksi Produksi – Kab. Sukabumi</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ── CSS Variables ───────────────────────────────────────────── */
+    :root {
+      --hijau-tua:    #1B5E20;
+      --hijau-medium: #2E7D32;
+      --hijau-muda:   #4CAF50;
+      --hijau-terang: #A5D6A7;
+      --hijau-bg:     #E8F5E9;
+      --emas:         #F9A825;
+      --putih:        #FFFFFF;
+      --abu-terang:   #F5F6FA;
+      --abu:          #6C757D;
+      --teks-gelap:   #1a1a2e;
+      --border:       #dee2e6;
+      --shadow:       0 2px 16px rgba(27,94,32,.10);
+      --shadow-md:    0 4px 28px rgba(27,94,32,.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--abu-terang);
+      color: var(--teks-gelap);
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ─────────────────────────────────────────────────── */
+    .navbar-gov {
+      background: linear-gradient(135deg, var(--hijau-tua) 0%, var(--hijau-medium) 100%);
+      border-bottom: 3px solid var(--emas);
+      padding: 0;
+      box-shadow: 0 2px 12px rgba(0,0,0,.25);
+    }
+    .navbar-gov .nav-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0;
+    }
+    .navbar-gov .logo-box {
+      width: 54px;
+      height: 54px;
+      background: var(--putih);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 6px;
+    }
+    .navbar-gov .logo-box svg {
+      width: 100%;
+      height: 100%;
+    }
+    .navbar-gov .nav-title {
+      color: var(--putih);
+    }
+    .navbar-gov .nav-title .subtitle {
+      font-size: 0.72rem;
+      font-weight: 500;
+      opacity: .78;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    .navbar-gov .nav-title h1 {
+      font-size: 1.0rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin: 0;
+      letter-spacing: -.01em;
+    }
+    .nav-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.25);
+      color: var(--putih);
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    /* ── HERO STRIP ─────────────────────────────────────────────── */
+    .hero-strip {
+      background: linear-gradient(90deg, var(--hijau-bg) 0%, #fff 100%);
+      border-bottom: 1px solid var(--hijau-terang);
+      padding: 18px 0;
+    }
+    .hero-strip h2 {
+      font-family: 'Source Serif 4', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--hijau-tua);
+      margin: 0;
+    }
+    .hero-strip p {
+      font-size: .84rem;
+      color: var(--abu);
+      margin: 4px 0 0;
+    }
+    .komoditi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--hijau-tua);
+      color: var(--putih);
+      font-size: .78rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 6px;
+      letter-spacing: .3px;
+    }
+
+    /* ── CARDS ───────────────────────────────────────────────────── */
+    .card-gov {
+      background: var(--putih);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-gov .card-header-gov {
+      background: var(--hijau-tua);
+      color: var(--putih);
+      padding: 13px 20px;
+      font-weight: 700;
+      font-size: .9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-gov .card-header-gov.accent {
+      background: linear-gradient(90deg, var(--hijau-tua), var(--hijau-medium));
+    }
+    .card-gov .card-body-gov {
+      padding: 20px;
+    }
+
+    /* ── METRIC BOXES ────────────────────────────────────────────── */
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .metric-box {
+      background: var(--hijau-bg);
+      border: 1px solid var(--hijau-terang);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .metric-box .metric-label {
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--hijau-medium);
+      margin-bottom: 4px;
+    }
+    .metric-box .metric-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--hijau-tua);
+      line-height: 1;
+    }
+    .metric-box .metric-sub {
+      font-size: .7rem;
+      color: var(--abu);
+      margin-top: 2px;
+    }
+
+    /* ── RESULT BOX ──────────────────────────────────────────────── */
+    .result-box {
+      background: linear-gradient(135deg, var(--hijau-tua) 0%, var(--hijau-medium) 100%);
+      border-radius: 12px;
+      color: var(--putih);
+      padding: 24px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-box::before {
+      content: '';
+      position: absolute;
+      right: -30px; top: -30px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.08);
+    }
+    .result-box .result-year {
+      font-size: .82rem;
+      font-weight: 600;
+      opacity: .8;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .result-box .result-value {
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1;
+      margin: 6px 0 2px;
+    }
+    .result-box .result-unit {
+      font-size: .9rem;
+      opacity: .8;
+    }
+    .result-box .result-note {
+      font-size: .76rem;
+      opacity: .65;
+      margin-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.2);
+      padding-top: 10px;
+    }
+
+    /* ── FORM ────────────────────────────────────────────────────── */
+    .form-label-gov {
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--hijau-tua);
+      margin-bottom: 6px;
+    }
+    .form-control-gov {
+      border: 2px solid var(--hijau-terang);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .9rem;
+      font-family: inherit;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-control-gov:focus {
+      outline: none;
+      border-color: var(--hijau-medium);
+      box-shadow: 0 0 0 3px rgba(46,125,50,.15);
+    }
+    .btn-gov {
+      background: var(--hijau-tua);
+      color: var(--putih);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 28px;
+      font-weight: 700;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: background .2s, transform .1s, box-shadow .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .btn-gov:hover {
+      background: var(--hijau-medium);
+      box-shadow: 0 4px 14px rgba(27,94,32,.3);
+      transform: translateY(-1px);
+    }
+    .btn-gov:active {
+      transform: translateY(0);
+    }
+
+    /* ── TABLE ───────────────────────────────────────────────────── */
+    .table-gov {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+    }
+    .table-gov thead th {
+      background: var(--hijau-tua);
+      color: var(--putih);
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      text-align: center;
+    }
+    .table-gov tbody tr:nth-child(odd)  { background: var(--putih); }
+    .table-gov tbody tr:nth-child(even) { background: var(--hijau-bg); }
+    .table-gov tbody tr:hover { background: #C8E6C9; }
+    .table-gov td {
+      padding: 9px 16px;
+      text-align: center;
+      border-bottom: 1px solid #E0E0E0;
+      font-weight: 500;
+    }
+
+    /* ── ALERT ───────────────────────────────────────────────────── */
+    .alert-gov {
+      background: #FFF3CD;
+      border: 1px solid #FFCC02;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: .86rem;
+      color: #664D03;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── PERSAMAAN BOX ───────────────────────────────────────────── */
+    .formula-box {
+      background: var(--hijau-bg);
+      border-left: 4px solid var(--hijau-tua);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: .88rem;
+      color: var(--hijau-tua);
+      font-weight: 600;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────────────── */
+    footer {
+      background: var(--hijau-tua);
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      font-size: .78rem;
+      padding: 16px;
+      margin-top: 40px;
+    }
+    footer strong { color: var(--putih); }
+
+    /* ── CHART ───────────────────────────────────────────────────── */
+    .chart-wrap { position: relative; height: 300px; }
+
+    /* ── SCROLL TABLE ────────────────────────────────────────────── */
+    .table-scroll { max-height: 320px; overflow-y: auto; }
+    .table-scroll::-webkit-scrollbar { width: 6px; }
+    .table-scroll::-webkit-scrollbar-thumb { background: var(--hijau-terang); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ NAVBAR ═══════════════════════════════════════ -->
+<nav class="navbar-gov">
+  <div class="container">
+    <div class="nav-inner">
+      <!-- Logo icon (daun herbal SVG sederhana) -->
+      <div class="logo-box">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="24" fill="#E8F5E9"/>
+          <path d="M24 38 C14 30, 10 18, 20 12 C22 20, 28 24, 24 38Z" fill="#2E7D32"/>
+          <path d="M24 38 C34 30, 38 18, 28 12 C26 20, 20 24, 24 38Z" fill="#4CAF50" opacity=".7"/>
+          <line x1="24" y1="38" x2="24" y2="16" stroke="#1B5E20" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="nav-title">
+        <div class="subtitle">HerbTrack Sukabumi</div>
+        <h1>Dashboard Analisis Produksi<br>Kumis Kucing</h1>
+      </div>
+      
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════ HERO STRIP ══════════════════════════════════ -->
+<div class="hero-strip">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+      <h2>Proyeksi Produksi Komoditi Herbal</h2>
+      <p>Analisis tren historis menggunakan metode Regresi Linear – Berdasarkan Data Dinas Perkebunan Jawa Barat</p>
+    </div>
+    <div class="komoditi-badge">
+      <i class="bi bi-flower1"></i> Kumis Kucing (Orthosiphon aristatus)
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN CONTENT ════════════════════════════════ -->
+<div class="container py-4">
+
+  <!-- Error global -->
+  {% if error and not result %}
+  <div class="alert-gov mb-3">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span><strong>Peringatan:</strong> {{ error }}</span>
+  </div>
+  {% endif %}
+
+  {% if not error or result %}
+  <!-- ─── ROW 1 : Metrik + Grafik ────────────────────────────────────── -->
+  <div class="row g-3 mb-3">
+
+    <!-- Metrik Evaluasi -->
+    <div class="col-lg-4">
+      <div class="card-gov h-100">
+        <div class="card-header-gov"><i class="bi bi-bar-chart-line-fill"></i> Metrik Evaluasi Model</div>
+        <div class="card-body-gov">
+          <div class="metric-row mb-3">
+            <div class="metric-box">
+              <div class="metric-label">R²</div>
+              <div class="metric-value">{{ metrics.r2 }}</div>
+              <div class="metric-sub">Koefisien Determinasi</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">MAE</div>
+              <div class="metric-value">{{ metrics.mae }}</div>
+              <div class="metric-sub">Ton</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-label">RMSE</div>
+              <div class="metric-value">{{ metrics.rmse }}</div>
+              <div class="metric-sub">Ton</div>
+            </div>
+          </div>
+
+          <!-- Persamaan Regresi -->
+          <div class="formula-box mb-3">
+            <i class="bi bi-function"></i>&nbsp;
+            Ŷ = {{ metrics.slope }} × Tahun + ({{ metrics.intercept }})
+          </div>
+
+          <p style="font-size:.8rem;color:var(--abu);line-height:1.6;margin:0">
+            <strong>R²</strong> mengukur proporsi variansi produksi yang dapat dijelaskan oleh model.
+            <strong>MAE</strong> & <strong>RMSE</strong> menunjukkan rata-rata selisih prediksi terhadap data aktual (dalam Ton).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grafik Regresi -->
+    <div class="col-lg-8">
+      <div class="card-gov h-100">
+        <div class="card-header-gov accent"><i class="bi bi-graph-up-arrow"></i> Grafik Tren & Garis Regresi Linear</div>
+        <div class="card-body-gov">
+          <div class="chart-wrap">
+            <canvas id="regresiChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ROW 2 : Form Proyeksi + Hasil + Tabel ─────────────────────── -->
+  <div class="row g-3">
+
+    <!-- Form + Hasil -->
+    <div class="col-lg-5">
+
+      <!-- Form -->
+      <div class="card-gov mb-3">
+        <div class="card-header-gov"><i class="bi bi-calculator-fill"></i> Form Proyeksi Produksi</div>
+        <div class="card-body-gov">
+          <form method="POST" action="/prediksi">
+            <div class="mb-3">
+              <label class="form-label-gov" for="tahun_proyeksi">
+                <i class="bi bi-calendar3"></i> Tahun Proyeksi
+              </label>
+              <input
+                type="number"
+                id="tahun_proyeksi"
+                name="tahun_proyeksi"
+                class="form-control-gov w-100"
+                placeholder="Contoh: 2026"
+                min="2000"
+                max="2100"
+                value="{{ result.tahun if result else '' }}"
+                required
+              />
+              <div style="font-size:.75rem;color:var(--abu);margin-top:5px;">
+                Masukkan tahun proyeksi yang ingin diprediksi (misal: 2025 – 2030).
+              </div>
+            </div>
+            <button type="submit" class="btn-gov w-100 justify-content-center">
+              <i class="bi bi-cpu-fill"></i> Jalankan Proyeksi
+            </button>
+          </form>
+
+          {% if error and result is none %}
+          <div class="alert-gov mt-3">
+            <i class="bi bi-exclamation-triangle-fill"></i> {{ error }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Hasil Proyeksi -->
+      {% if result %}
+      <div class="card-gov">
+        <div class="card-header-gov"><i class="bi bi-check2-circle"></i> Hasil Proyeksi</div>
+        <div class="card-body-gov p-0">
+          <div class="result-box">
+            <div class="result-year"><i class="bi bi-calendar-check"></i> Proyeksi Tahun {{ result.tahun }}</div>
+            <div class="result-value">{{ "{:,.2f}".format(result.nilai) }}</div>
+            <div class="result-unit">Ton Produksi Kumis Kucing</div>
+            <div class="result-note">
+              * Hasil merupakan estimasi berdasarkan model Regresi Linear dari data historis Kabupaten Sukabumi.
+                Nilai aktual dapat berbeda akibat faktor iklim, kebijakan, dan kondisi lapangan.
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="card-gov">
+        <div class="card-header-gov"><i class="bi bi-info-circle"></i> Keterangan</div>
+        <div class="card-body-gov" style="font-size:.84rem;color:var(--abu);line-height:1.7">
+          <i class="bi bi-arrow-left-circle" style="color:var(--hijau-tua)"></i>
+          Isi form di atas lalu klik <strong>Jalankan Proyeksi</strong> untuk mendapatkan estimasi produksi Kumis Kucing
+          di Kabupaten Sukabumi pada tahun yang ditentukan.
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Tabel Data Historis -->
+    <div class="col-lg-7">
+      <div class="card-gov h-100">
+        <div class="card-header-gov"><i class="bi bi-table"></i> Data Historis Produksi – Kabupaten Sukabumi</div>
+        <div class="card-body-gov p-0">
+          <div class="table-scroll">
+            <table class="table-gov">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Tahun</th>
+                  <th>Produksi (Ton)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i, row in enumerate(table) %}
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ row['Tahun'] }}</td>
+                  <td>{{ "{:,.1f}".format(row['Produksi (Ton)']) }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:10px 16px;font-size:.75rem;color:var(--abu);border-top:1px solid var(--border);">
+            Sumber: Dinas Perkebunan Jawa Barat – Open Data Jabar
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /row -->
+  {% endif %}
+
+</div><!-- /container -->
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════════════════════ -->
+<footer>
+  <strong>Dashboard Analisis Produksi Kumis Kucing</strong> &nbsp;|&nbsp;
+  Kabupaten Sukabumi &nbsp;|&nbsp; Dibangun dengan Python Flask &amp; Scikit-learn &nbsp;|&nbsp;
+  Data: Open Data Jawa Barat
+</footer>
+
+<!-- ═══════════════════════ SCRIPTS ════════════════════════════════════ -->
+<script>
+  // ── Jinja enumerate helper ──────────────────────────────────────────────
+  // (already handled via Python side; this is Chart.js only)
+
+  {% if chart_data %}
+  const tahunData   = {{ chart_data.tahun | tojson }};
+  const aktualData  = {{ chart_data.aktual | tojson }};
+  const prediksiData = {{ chart_data.prediksi | tojson }};
+
+  {% if result %}
+  const tahunPred = {{ chart_data.tahun_pred }};
+  const nilaiPred = {{ chart_data.nilai_pred }};
+  {% else %}
+  const tahunPred = null;
+  const nilaiPred = null;
+  {% endif %}
+
+  // Extend line data to cover prediction year
+  let lineLabels = [...tahunData];
+  let lineValues = [...prediksiData];
+
+  if (tahunPred && !lineLabels.includes(tahunPred)) {
+    lineLabels.push(tahunPred);
+    lineValues.push(nilaiPred);
+  }
+
+  const ctx = document.getElementById('regresiChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        {
+          label: 'Data Aktual (Ton)',
+          data: tahunData.map((t, i) => ({ x: t, y: aktualData[i] })),
+          backgroundColor: '#1B5E20',
+          pointRadius: 7,
+          pointHoverRadius: 9,
+          type: 'scatter',
+        },
+        {
+          label: 'Garis Regresi Linear',
+          data: lineLabels.map((t, i) => ({ x: t, y: lineValues[i] })),
+          borderColor: '#F9A825',
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
+          pointRadius: 0,
+          type: 'line',
+          tension: 0,
+        },
+        ...(tahunPred ? [{
+          label: `Proyeksi ${tahunPred}`,
+          data: [{ x: tahunPred, y: nilaiPred }],
+          backgroundColor: '#E53935',
+          pointRadius: 10,
+          pointStyle: 'star',
+          type: 'scatter',
+        }] : [])
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { font: { family: 'Plus Jakarta Sans', size: 12 }, boxWidth: 14 }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${Number(ctx.parsed.y).toFixed(2)} Ton`
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          title: { display: true, text: 'Tahun', font: { weight: 'bold', size: 12 } },
+          ticks: { stepSize: 1, callback: v => v }
+        },
+        y: {
+          title: { display: true, text: 'Produksi (Ton)', font: { weight: 'bold', size: 12 } },
+          beginAtZero: false,
+        }
+      }
+    }
+  });
+  {% endif %}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
